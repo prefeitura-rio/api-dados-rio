@@ -11,7 +11,7 @@ env:
   GH_PAT: ${{ secrets.GH_PAT }}
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
   GKE_ZONE: ${{ secrets.GKE_ZONE }}
-  IMAGE_NAME: ghcr.io/prefeitura-rio/comando-api
+  IMAGE_NAME: ghcr.io/prefeitura-rio/api-dados-rio
 
 
 jobs:
@@ -51,4 +51,4 @@ jobs:
         run: |-
           ./kustomize edit set image gcr.io/PROJECT_ID/IMAGE_NAME:TAG=$IMAGE_NAME:$GITHUB_SHA
           ./kustomize build . | kubectl apply -f -
-          kubectl rollout status -w -n comando-dados-rio deployment/comando-api
+          kubectl rollout status -w -n api-dados-rio deployment/api-dados-rio
