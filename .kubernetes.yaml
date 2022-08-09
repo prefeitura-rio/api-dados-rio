@@ -1,0 +1,92 @@
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-dados-rio
+  namespace: api-dados-rio
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 50%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: api-dados-rio
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: api-dados-rio
+    spec:
+      containers:
+        - name: api-dados-rio
+          image: gcr.io/PROJECT_ID/IMAGE_NAME:TAG
+          ports:
+            - containerPort: 80
+          envFrom:
+            - secretRef:
+                name: api-dados-rio-secrets
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - bash
+                - "-c"
+                - kill -0 $(cat /run/nginx.pid)
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      restartPolicy: Always
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: api-dados-rio
+  name: api-dados-rio
+  namespace: api-dados-rio
+spec:
+  ports:
+    - name: "80"
+      port: 80
+      targetPort: 80
+  selector:
+    app: api-dados-rio
+
+---
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-dados-rio-ingress
+  namespace: api-dados-rio
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/issuer: "letsencrypt-production"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  tls:
+    - hosts:
+        - api.dados.rio
+      secretName: api-dados-rio-tls
+  rules:
+    - host: api.dados.rio
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-dados-rio
+                port:
+                  number: 80

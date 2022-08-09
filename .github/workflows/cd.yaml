@@ -1,0 +1,54 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+  GH_PAT: ${{ secrets.GH_PAT }}
+  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
+  GKE_ZONE: ${{ secrets.GKE_ZONE }}
+  IMAGE_NAME: ghcr.io/prefeitura-rio/comando-api
+
+
+jobs:
+  build-container:
+    name: Build, publish and register
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v0.2.1
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          export_default_credentials: true
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v0.2.1
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+          credentials: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Build and publish image
+        run: |
+          docker build -t $IMAGE_NAME:$GITHUB_SHA .
+          echo $GH_PAT | docker login ghcr.io -u gabriel-milan --password-stdin
+          docker push $IMAGE_NAME:$GITHUB_SHA
+
+      - name: Set up Kustomize
+        run: |-
+          curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+          chmod u+x ./kustomize
+
+      - name: Deploy
+        run: |-
+          ./kustomize edit set image gcr.io/PROJECT_ID/IMAGE_NAME:TAG=$IMAGE_NAME:$GITHUB_SHA
+          ./kustomize build . | kubectl apply -f -
+          kubectl rollout status -w -n comando-dados-rio deployment/comando-api

@@ -1,0 +1,7 @@
+# To do
+
+- `API_URL_LIST_EVENTOS`
+- `API_URL_LIST_ATIVIDADES_EVENTOS`
+- `API_URL_LIST_ATIVIDADES_POP`
+- Throttling
+- API docs (se possível)

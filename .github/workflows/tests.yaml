@@ -1,0 +1,35 @@
+name: CI - Tests
+
+on:
+  push:
+
+jobs:
+  tests:
+    name: ${{ matrix.os }}${{ matrix.arch }} - Python ${{ matrix.python-version }} - tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        arch: [x64]
+        python-version: ["3.9.x"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.arch }}
+
+      - name: Set up Poetry and upgrade pip
+        run: |
+          pip install -U pip poetry
+
+      - name: Install this package
+        run: |
+          poetry install
+
+      - name: Run tests
+        run: |
+          poetry run test
