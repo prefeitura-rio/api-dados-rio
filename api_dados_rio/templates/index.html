@@ -14,6 +14,19 @@
         </div>
         <div class="container-fluid">
           <div class="row p-3">
+            {% for item in docs_links %}
+              <div class="col-md-4">
+                <a href="{{ item.1 }}">
+                  <div class="card mt-4">
+                    <div class="btn btn-primary">
+                      <div class="p-3">
+                        <h2 class="card-title fw-bold">{{ item.0 }}</h2>
+                      </div>
+                    </div>
+                </div>
+              </a>
+            </div>
+            {% endfor %}
             {% for item in subrouters %}
               <div class="col-md-4">
                 <a href="{{ item }}">
