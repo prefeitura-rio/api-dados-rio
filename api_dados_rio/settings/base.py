@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "rest_framework",
+    "drf_yasg",
     "api_dados_rio.v1.comando",
 ]
 
@@ -150,7 +151,7 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.AnonRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "1/second",
+        "anon": "60/minute",
     },
     "PAGE_SIZE": 20,
 }

@@ -5,6 +5,9 @@ from typing import Dict, List
 from django.core.cache import cache
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.utils.decorators import method_decorator
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 import requests
 from requests.adapters import HTTPAdapter, Retry
 from rest_framework.request import Request
@@ -45,6 +48,31 @@ def get_url(url, parameters: dict = None, token: str = None):  # pylint: disable
     return response
 
 
+@method_decorator(
+    name="list",
+    decorator=swagger_auto_schema(
+        operation_summary="Lista todos os POPs (Procedimento Operacional Padrão)",
+        operation_description="""
+        **Resultado**: Retorna uma lista contendo todos os POPs existentes com o seguinte formato:
+
+        ```json
+        {
+            "retorno": "OK",
+            "mensagem": "",
+            "objeto": [
+                {
+                    "titulo": "Abalroamento",
+                    "id": 24
+                },
+                ...
+            ]
+        }
+        ```
+
+        **Política de cache**: O resultado é armazenado em cache por um período de 1 dia.
+        """,
+    ),
+)
 class PopsView(ViewSet):
     def list(self, request):
         key = "pops"
@@ -62,6 +90,41 @@ class PopsView(ViewSet):
         return Response(result)
 
 
+@method_decorator(
+    name="list",
+    decorator=swagger_auto_schema(
+        operation_summary="Lista todos os eventos abertos no momento",
+        operation_description="""
+        **Resultado**: Retorna uma lista contendo todos os eventos abertos com o seguinte formato:
+
+        ```json
+        {
+            "eventos": [
+                {
+                    "tipo": "SECUNDARIO",
+                    "pop_id": 25,
+                    "bairro": "Botafogo",
+                    "latitude": -22.9513106,
+                    "anexos": [],
+                    "inicio": "2022-06-09 09:43:26.0",
+                    "titulo": "Obra na Via ( Naturgy ) Cam 182",
+                    "prazo": "LONGO",
+                    "descricao": "R. São Clemente - Alt. n° 355 - Botafogo",
+                    "informe_id": 75866,
+                    "gravidade": "BAIXO",
+                    "id": 75865,
+                    "longitude": -43.1942684,
+                    "status": "ABERTO",
+                },
+                ...
+            ]
+        }
+        ```
+
+        **Política de cache**: O resultado é armazenado em cache por um período de 5 minutos.
+        """,
+    ),
+)
 class EventosAbertosView(ViewSet):
     def list(self, request):
         key = "eventos_abertos"
@@ -79,6 +142,57 @@ class EventosAbertosView(ViewSet):
         return Response(result)
 
 
+@method_decorator(
+    name="list",
+    decorator=swagger_auto_schema(
+        operation_summary="Lista todos os eventos de acordo com os parâmetros informados",
+        operation_description="""
+        **Resultado**: Retorna uma lista contendo eventos com o seguinte formato:
+
+        ```json
+        {
+            "eventos": [
+                {
+                    "tipo": "SECUNDARIO",
+                    "pop_id": 25,
+                    "bairro": "Botafogo",
+                    "latitude": -22.9513106,
+                    "anexos": [],
+                    "inicio": "2022-06-09 09:43:26.0",
+                    "titulo": "Obra na Via ( Naturgy ) Cam 182",
+                    "prazo": "LONGO",
+                    "descricao": "R. São Clemente - Alt. n° 355 - Botafogo",
+                    "informe_id": 75866,
+                    "gravidade": "BAIXO",
+                    "id": 75865,
+                    "longitude": -43.1942684,
+                    "status": "ABERTO",
+                },
+                ...
+            ]
+        }
+        ```
+
+        **Política de cache**: O resultado é armazenado em cache por um período de 5 minutos.
+        """,
+        manual_parameters=[
+            openapi.Parameter(
+                "inicio",
+                openapi.IN_QUERY,
+                description="Data de início da listagem de eventos",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+            openapi.Parameter(
+                "fim",
+                openapi.IN_QUERY,
+                description="Data de fim da listagem de eventos (máximo: início + 30 dias)",
+                type=openapi.TYPE_STRING,
+                required=False,
+            ),
+        ],
+    ),
+)
 class EventosView(ViewSet):
     def list(self, request: Request):
         # Set some date formats we're going to use
@@ -186,6 +300,42 @@ class EventosView(ViewSet):
         return Response(results)
 
 
+@method_decorator(
+    name="list",
+    decorator=swagger_auto_schema(
+        operation_summary="Lista as atividades relacionadas a um evento",
+        operation_description="""
+        **Resultado**: Retorna uma lista contendo atividades de um evento com o seguinte formato:
+
+        ```json
+        {
+            "atividades": [
+                {
+                "orgao": "CET-RIO",
+                "chegada": "2022-06-09 09:47:04",
+                "inicio": "2022-06-09 09:47:04",
+                "nome": "Companhia de Engenharia de Tráfego",
+                "descricao": "Monitorar possíveis interdições",
+                "status": "PRESENTE"
+                },
+                ...
+            ]
+        }
+        ```
+
+        **Política de cache**: O resultado é armazenado em cache por um período de 5 minutos.
+        """,
+        manual_parameters=[
+            openapi.Parameter(
+                "eventoId",
+                openapi.IN_QUERY,
+                description="ID do evento",
+                type=openapi.TYPE_INTEGER,
+                required=True,
+            ),
+        ],
+    ),
+)
 class AtividadesEventoView(ViewSet):
     def list(self, request):
         base_key = "atividades_evento"
@@ -206,6 +356,40 @@ class AtividadesEventoView(ViewSet):
         return Response(result)
 
 
+@method_decorator(
+    name="list",
+    decorator=swagger_auto_schema(
+        operation_summary="Lista as atividades relacionadas a um POP",
+        operation_description="""
+        **Resultado**: Retorna uma lista contendo atividades de um POP com o seguinte formato:
+
+        ```json
+        {
+        "pop": "Bolsão d'água em via",
+        "atividades": [
+                {
+                "sigla": "CET-RIO",
+                "orgao": "Companhia de Engenharia de Tráfego",
+                "acao": "Desfazer o acidente"
+                },
+                ...
+            ]
+        }
+        ```
+
+        **Política de cache**: O resultado é armazenado em cache por um período de 1 dia.
+        """,
+        manual_parameters=[
+            openapi.Parameter(
+                "popId",
+                openapi.IN_QUERY,
+                description="ID do POP",
+                type=openapi.TYPE_INTEGER,
+                required=True,
+            ),
+        ],
+    ),
+)
 class AtividadesPopView(ViewSet):
     def list(self, request):
         base_key = "atividades_pop"
