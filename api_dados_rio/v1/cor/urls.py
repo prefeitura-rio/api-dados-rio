@@ -2,14 +2,12 @@
 from django.shortcuts import render
 from django.urls import include, path
 
-from .cor.urls import urlpatterns as cor_urlpatterns
+from .comando.urls import router as comando_router
 
-SUBROUTERS = {}
-SUBURLPATTERNS = {"cor/": cor_urlpatterns}
-DOCS_LINKS = [
-    ("Docs (Swagger)", "/swagger/"),
-    ("Docs (redoc)", "/redoc/"),
-]
+SUBROUTERS = {
+    "comando/": comando_router,
+}
+DOCS_LINKS = []
 
 
 def home(request):
@@ -17,8 +15,8 @@ def home(request):
         request,
         "index.html",
         {
-            "subrouters": list(SUBROUTERS.keys()) + list(SUBURLPATTERNS.keys()),
-            "version": "(v1)",
+            "subrouters": list(SUBROUTERS.keys()),
+            "version": "/cor (v1)",
             "docs_links": DOCS_LINKS,
         },
     )
@@ -30,8 +28,6 @@ def generate_urlpatterns():
     ]
     for router_path, router in SUBROUTERS.items():
         urlpatterns.append(path(router_path, include(router.urls)))
-    for urlpatterns_path, urlpatterns_urls in SUBURLPATTERNS.items():
-        urlpatterns.append(path(urlpatterns_path, include(urlpatterns_urls)))
     return urlpatterns
 
 

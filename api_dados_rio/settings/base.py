@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "drf_yasg",
-    "api_dados_rio.v1.comando",
+    "api_dados_rio.v1.cor.comando",
 ]
 
 MIDDLEWARE = [
