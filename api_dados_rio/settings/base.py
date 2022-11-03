@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "rest_framework",
+    "rest_framework_tracking",
     "drf_yasg",
     "api_dados_rio.v1.cor.comando",
 ]

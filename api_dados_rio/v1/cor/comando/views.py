@@ -13,6 +13,7 @@ from requests.adapters import HTTPAdapter, Retry
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
+from rest_framework_tracking.mixins import LoggingMixin
 
 # Cache timeout
 CACHE_TTL_SHORT = getattr(settings, "CACHE_TTL_SHORT", DEFAULT_TIMEOUT)
@@ -73,7 +74,7 @@ def get_url(url, parameters: dict = None, token: str = None):  # pylint: disable
         """,
     ),
 )
-class PopsView(ViewSet):
+class PopsView(LoggingMixin, ViewSet):
     def list(self, request):
         key = "pops"
         url = getattr(settings, "API_URL_LIST_POPS")
@@ -125,7 +126,7 @@ class PopsView(ViewSet):
         """,
     ),
 )
-class EventosAbertosView(ViewSet):
+class EventosAbertosView(LoggingMixin, ViewSet):
     def list(self, request):
         key = "eventos_abertos"
         url = getattr(settings, "API_URL_LIST_EVENTOS_ABERTOS")
@@ -193,7 +194,7 @@ class EventosAbertosView(ViewSet):
         ],
     ),
 )
-class EventosView(ViewSet):
+class EventosView(LoggingMixin, ViewSet):
     def list(self, request: Request):
         # Set some date formats we're going to use
         date_format = "%Y-%m-%d %H:%M:%S.0"
@@ -336,7 +337,7 @@ class EventosView(ViewSet):
         ],
     ),
 )
-class AtividadesEventoView(ViewSet):
+class AtividadesEventoView(LoggingMixin, ViewSet):
     def list(self, request):
         base_key = "atividades_evento"
         base_url = getattr(settings, "API_URL_LIST_ATIVIDADES_EVENTOS")
@@ -390,7 +391,7 @@ class AtividadesEventoView(ViewSet):
         ],
     ),
 )
-class AtividadesPopView(ViewSet):
+class AtividadesPopView(LoggingMixin, ViewSet):
     def list(self, request):
         base_key = "atividades_pop"
         base_url = getattr(settings, "API_URL_LIST_ATIVIDADES_POP")

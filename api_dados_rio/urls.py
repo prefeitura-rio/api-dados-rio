@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import include, path, re_path
 from drf_yasg import openapi
@@ -42,6 +43,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("", home_view),
+    path("admin/", admin.site.urls),
     path("v1/", include(v1_urlpatterns)),
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
