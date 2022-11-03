@@ -1,4 +1,20 @@
 ---
+# PVC for logs
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: api-dados-rio
+  name: django-logs-pvc
+  namespace: api-dados-rio
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
 # Deployment
 apiVersion: apps/v1
 kind: Deployment
@@ -29,6 +45,10 @@ spec:
           envFrom:
             - secretRef:
                 name: api-dados-rio-secrets
+          volumeMounts:
+            - name: django-logs
+              mountPath: /var/log/django
+              readOnly: false
           readinessProbe:
             httpGet:
               path: /
@@ -44,6 +64,10 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
       restartPolicy: Always
+      volumes:
+        - name: django-logs
+          persistentVolumeClaim:
+            claimName: django-logs-pvc
 
 ---
 # Service
