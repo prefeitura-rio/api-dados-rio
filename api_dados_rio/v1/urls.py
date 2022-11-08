@@ -25,7 +25,9 @@ router = IndexRouter(
     name="V1",
     deprecated_func=v1_deprecated,
     swagger_operation_summary="Acessa a versão 1 da API de dados do Escritório de Dados Rio",
-    swagger_operation_description="",
+    swagger_operation_description="""
+    **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
+    """,
 )
 
 urlpatterns = router.to_urlpatterns()

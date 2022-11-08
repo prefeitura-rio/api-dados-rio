@@ -12,7 +12,9 @@ router = IndexRouter(
     name="COR",
     deprecated_func=v1_deprecated,
     swagger_operation_summary="Acessa APIs de dados relacionados ao COR (Centro de Operações Rio)",
-    swagger_operation_description="",
+    swagger_operation_description="""
+    **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
+    """,
 )
 
 urlpatterns = router.to_urlpatterns()
