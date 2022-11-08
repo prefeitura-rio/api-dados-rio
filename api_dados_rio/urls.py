@@ -23,12 +23,13 @@ from rest_framework import permissions
 
 from api_dados_rio.custom.routers import IndexRouter
 from api_dados_rio.v1.urls import urlpatterns as v1_urlpatterns
+from api_dados_rio.v2.urls import urlpatterns as v2_urlpatterns
 
 
 schema_view = get_schema_view(
     openapi.Info(
         title="API Dados Rio",
-        default_version="v1",
+        default_version="v2",
         description="API de dados públicos do Escritório de Dados",
         terms_of_service="",
         contact=openapi.Contact(email="escritoriodedados@gmail.com"),
@@ -41,6 +42,7 @@ schema_view = get_schema_view(
 base_urlpatterns = [
     path("admin/", admin.site.urls),
     path("v1/", include(v1_urlpatterns)),
+    path("v2/", include(v2_urlpatterns)),
     path(
         "docs/",
         schema_view.with_ui("swagger", cache_timeout=0),
