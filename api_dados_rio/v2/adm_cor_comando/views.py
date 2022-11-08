@@ -67,8 +67,6 @@ def get_url(url, parameters: dict = None, token: str = None):  # pylint: disable
         deprecated=v1_deprecated(),
         operation_summary="Lista todos os POPs (Procedimento Operacional Padrão)",
         operation_description="""
-        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
-
         **Resultado**: Retorna uma lista contendo todos os POPs existentes com o seguinte formato:
 
         ```json
@@ -119,8 +117,6 @@ class PopsView(LoggingMixin, ViewSet):
         deprecated=v1_deprecated(),
         operation_summary="Lista todos os eventos abertos no momento",
         operation_description="""
-        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
-
         **Resultado**: Retorna uma lista contendo todos os eventos abertos com o seguinte formato:
 
         ```json
@@ -181,8 +177,6 @@ class EventosAbertosView(LoggingMixin, ViewSet):
         deprecated=v1_deprecated(),
         operation_summary="Lista todos os eventos de acordo com os parâmetros informados",
         operation_description="""
-        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
-
         **Resultado**: Retorna uma lista contendo eventos com o seguinte formato:
 
         ```json
@@ -354,8 +348,6 @@ class EventosView(LoggingMixin, ViewSet):
         deprecated=v1_deprecated(),
         operation_summary="Lista as atividades relacionadas a um evento",
         operation_description="""
-        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
-
         **Resultado**: Retorna uma lista contendo atividades de um evento com o seguinte formato:
 
         ```json
@@ -420,8 +412,6 @@ class AtividadesEventoView(LoggingMixin, ViewSet):
         deprecated=v1_deprecated(),
         operation_summary="Lista as atividades relacionadas a um POP",
         operation_description="""
-        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
-
         **Resultado**: Retorna uma lista contendo atividades de um POP com o seguinte formato:
 
         ```json
