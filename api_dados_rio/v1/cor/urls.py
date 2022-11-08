@@ -1,34 +1,18 @@
 # -*- coding: utf-8 -*-
-from django.shortcuts import render
 from django.urls import include, path
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
+from api_dados_rio.custom.routers import IndexRouter
+from api_dados_rio.v1 import v1_deprecated
 from .comando.urls import router as comando_router
 
-SUBROUTERS = {
-    "comando/": comando_router,
-}
-DOCS_LINKS = []
+router = IndexRouter(
+    routers={"comando": comando_router},
+    name="COR",
+    deprecated_func=v1_deprecated,
+    swagger_operation_summary="Acessa APIs de dados relacionados ao COR (Centro de Operações Rio)",
+    swagger_operation_description="",
+)
 
-
-def home(request):
-    return render(
-        request,
-        "index.html",
-        {
-            "subrouters": list(SUBROUTERS.keys()),
-            "version": "/cor (v1)",
-            "docs_links": DOCS_LINKS,
-        },
-    )
-
-
-def generate_urlpatterns():
-    urlpatterns = [
-        path("", home),
-    ]
-    for router_path, router in SUBROUTERS.items():
-        urlpatterns.append(path(router_path, include(router.urls)))
-    return urlpatterns
-
-
-urlpatterns = generate_urlpatterns()
+urlpatterns = router.to_urlpatterns()

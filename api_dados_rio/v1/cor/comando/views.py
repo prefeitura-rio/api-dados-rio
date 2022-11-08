@@ -15,9 +15,21 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework_tracking.mixins import LoggingMixin
 
+from api_dados_rio.v1 import v1_deprecated, v1_deprecation_headers
+
 # Cache timeout
 CACHE_TTL_SHORT = getattr(settings, "CACHE_TTL_SHORT", DEFAULT_TIMEOUT)
 CACHE_TTL_LONG = getattr(settings, "CACHE_TTL_LONG", DEFAULT_TIMEOUT)
+
+
+class ResponseWithDeprecationHeaders(Response):
+    """Response with deprecation headers"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        deprecation_headers = v1_deprecation_headers()
+        for header, value in deprecation_headers.items():
+            self[header] = value
 
 
 def get_token():
@@ -52,8 +64,11 @@ def get_url(url, parameters: dict = None, token: str = None):  # pylint: disable
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
+        deprecated=v1_deprecated(),
         operation_summary="Lista todos os POPs (Procedimento Operacional Padrão)",
         operation_description="""
+        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
+
         **Resultado**: Retorna uma lista contendo todos os POPs existentes com o seguinte formato:
 
         ```json
@@ -81,21 +96,31 @@ class PopsView(LoggingMixin, ViewSet):
         # Hit cache
         if key in cache:
             pops = cache.get(key)
-            return Response(pops)
-        result = get_url(url)
-        if "error" in result and result["error"]:
-            return Response(
-                {"error": "Something went wrong. Try again later."}, status=500
+            return ResponseWithDeprecationHeaders(pops)
+        try:
+            result = get_url(url)
+            if "error" in result and result["error"]:
+                return ResponseWithDeprecationHeaders(
+                    {"error": "Something went wrong. Try again later."},
+                    status=500,
+                )
+            cache.set(key, result, timeout=CACHE_TTL_LONG)
+            return ResponseWithDeprecationHeaders(result)
+        except Exception:
+            return ResponseWithDeprecationHeaders(
+                {"error": "Something went wrong. Try again later."},
+                status=500,
             )
-        cache.set(key, result, timeout=CACHE_TTL_LONG)
-        return Response(result)
 
 
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
+        deprecated=v1_deprecated(),
         operation_summary="Lista todos os eventos abertos no momento",
         operation_description="""
+        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
+
         **Resultado**: Retorna uma lista contendo todos os eventos abertos com o seguinte formato:
 
         ```json
@@ -133,21 +158,31 @@ class EventosAbertosView(LoggingMixin, ViewSet):
         # Hit cache
         if key in cache:
             pops = cache.get(key)
-            return Response(pops)
-        result = get_url(url)
-        if "error" in result and result["error"]:
-            return Response(
-                {"error": "Something went wrong. Try again later."}, status=500
+            return ResponseWithDeprecationHeaders(pops)
+        try:
+            result = get_url(url)
+            if "error" in result and result["error"]:
+                return ResponseWithDeprecationHeaders(
+                    {"error": "Something went wrong. Try again later."},
+                    status=500,
+                )
+            cache.set(key, result, timeout=CACHE_TTL_SHORT)
+            return ResponseWithDeprecationHeaders(result)
+        except Exception:
+            return ResponseWithDeprecationHeaders(
+                {"error": "Something went wrong. Try again later."},
+                status=500,
             )
-        cache.set(key, result, timeout=CACHE_TTL_SHORT)
-        return Response(result)
 
 
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
+        deprecated=v1_deprecated(),
         operation_summary="Lista todos os eventos de acordo com os parâmetros informados",
         operation_description="""
+        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
+
         **Resultado**: Retorna uma lista contendo eventos com o seguinte formato:
 
         ```json
@@ -207,12 +242,15 @@ class EventosView(LoggingMixin, ViewSet):
         # First parameter is the start date, this is required
         inicio = parameters.get("inicio")
         if not inicio:
-            return Response({"error": 'Parameter "inicio" is required.'}, status=400)
+            return ResponseWithDeprecationHeaders(
+                {"error": 'Parameter "inicio" is required.'},
+                status=400,
+            )
         # Try to parse it from expected date format
         try:
             inicio = datetime.strptime(inicio, date_format)
         except ValueError:
-            return Response(
+            return ResponseWithDeprecationHeaders(
                 {"error": f'Parameter "inicio" must be in format {date_format}.'},
                 status=400,
             )
@@ -225,14 +263,14 @@ class EventosView(LoggingMixin, ViewSet):
             try:
                 fim = datetime.strptime(fim, date_format)
             except ValueError:
-                return Response(
+                return ResponseWithDeprecationHeaders(
                     {"error": f'Parameter "fim" must be in format {date_format}.'},
                     status=400,
                 )
             fim = fim.replace(hour=0, minute=0, second=0, microsecond=0)
             # Date diff must be less than or equal to 30 days
             if (fim - inicio) > timedelta(days=30):
-                return Response(
+                return ResponseWithDeprecationHeaders(
                     {"error": "(fim - inicio) must be less than or equal to 30 days."},
                     status=400,
                 )
@@ -265,7 +303,7 @@ class EventosView(LoggingMixin, ViewSet):
                 max_date = date
         # If we have everything in cache, return it
         if not min_date and not max_date:
-            return Response(results)
+            return ResponseWithDeprecationHeaders(results)
         if min_date == max_date:
             max_date += timedelta(days=1)
         # If we don't, fetch data for the date range we're missing
@@ -273,39 +311,51 @@ class EventosView(LoggingMixin, ViewSet):
             "inicio": min_date.strftime(date_format),
             "fim": max_date.strftime(date_format),
         }
-        result = get_url(url, parameters=date_range)
-        # If something happened, just return a 500
-        if "error" in result and result["error"]:
-            return Response(
-                {"error": "Something went wrong. Try again later."}, status=500
+        try:
+            result = get_url(url, parameters=date_range)
+            # If something happened, just return a 500
+            if "error" in result and result["error"]:
+                return ResponseWithDeprecationHeaders(
+                    {"error": "Something went wrong. Try again later."},
+                    status=500,
+                )
+            # Now we need to check for overlaps in data (and also cache it)
+            cache_dates: Dict[str, List] = {}
+            for evento in result["eventos"]:
+                # Parse the date
+                evento_date = datetime.strptime(evento["inicio"], date_format)
+                # Reset to midnight
+                evento_date = evento_date.replace(
+                    hour=0, minute=0, second=0, microsecond=0
+                )
+                # If this date is not in `from_cache`, add it to the results
+                if evento_date not in from_cache:
+                    results["eventos"].append(evento)
+                # Now we split dates into cache_dates keys and append the evento to the list
+                # in the cache_dates key
+                if evento_date not in cache_dates:
+                    cache_dates[evento_date] = []
+                cache_dates[evento_date].append(evento)
+            # Finally we loop through cache_dates and cache the data
+            for date, eventos in cache_dates.items():
+                key = f"{base_key}_{date.strftime(redis_date_format)}"
+                cache.set(key, {"eventos": eventos}, timeout=CACHE_TTL_SHORT)
+            return ResponseWithDeprecationHeaders(results)
+        except Exception:
+            return ResponseWithDeprecationHeaders(
+                {"error": "Something went wrong. Try again later."},
+                status=500,
             )
-        # Now we need to check for overlaps in data (and also cache it)
-        cache_dates: Dict[str, List] = {}
-        for evento in result["eventos"]:
-            # Parse the date
-            evento_date = datetime.strptime(evento["inicio"], date_format)
-            # Reset to midnight
-            evento_date = evento_date.replace(hour=0, minute=0, second=0, microsecond=0)
-            # If this date is not in `from_cache`, add it to the results
-            if evento_date not in from_cache:
-                results["eventos"].append(evento)
-            # Now we split dates into cache_dates keys and append the evento to the list
-            # in the cache_dates key
-            if evento_date not in cache_dates:
-                cache_dates[evento_date] = []
-            cache_dates[evento_date].append(evento)
-        # Finally we loop through cache_dates and cache the data
-        for date, eventos in cache_dates.items():
-            key = f"{base_key}_{date.strftime(redis_date_format)}"
-            cache.set(key, {"eventos": eventos}, timeout=CACHE_TTL_SHORT)
-        return Response(results)
 
 
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
+        deprecated=v1_deprecated(),
         operation_summary="Lista as atividades relacionadas a um evento",
         operation_description="""
+        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
+
         **Resultado**: Retorna uma lista contendo atividades de um evento com o seguinte formato:
 
         ```json
@@ -343,25 +393,35 @@ class AtividadesEventoView(LoggingMixin, ViewSet):
         base_url = getattr(settings, "API_URL_LIST_ATIVIDADES_EVENTOS")
         evento_id = request.query_params.get("eventoId")
         if not evento_id:
-            return Response({"error": "eventoId is required."})
+            return ResponseWithDeprecationHeaders({"error": "eventoId is required."})
         key = f"{base_key}_{evento_id}"
         url = f"{base_url}?eventoId={evento_id}"
         # Hit cache
         if key in cache:
             atividades = cache.get(key)
-            return Response(atividades)
-        result = get_url(url)
-        if "error" in result and result["error"]:
-            return Response({"error": "Something went wrong. Try again later."})
-        cache.set(key, result, timeout=CACHE_TTL_SHORT)
-        return Response(result)
+            return ResponseWithDeprecationHeaders(atividades)
+        try:
+            result = get_url(url)
+            if "error" in result and result["error"]:
+                return ResponseWithDeprecationHeaders(
+                    {"error": "Something went wrong. Try again later."}
+                )
+            cache.set(key, result, timeout=CACHE_TTL_SHORT)
+            return ResponseWithDeprecationHeaders(result)
+        except Exception:
+            return ResponseWithDeprecationHeaders(
+                {"error": "Something went wrong. Try again later."}
+            )
 
 
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
+        deprecated=v1_deprecated(),
         operation_summary="Lista as atividades relacionadas a um POP",
         operation_description="""
+        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
+
         **Resultado**: Retorna uma lista contendo atividades de um POP com o seguinte formato:
 
         ```json
@@ -397,15 +457,22 @@ class AtividadesPopView(LoggingMixin, ViewSet):
         base_url = getattr(settings, "API_URL_LIST_ATIVIDADES_POP")
         pop_id = request.query_params.get("popId")
         if not pop_id:
-            return Response({"error": "popId is required."})
+            return ResponseWithDeprecationHeaders({"error": "popId is required."})
         key = f"{base_key}_{pop_id}"
         url = f"{base_url}?popId={pop_id}"
         # Hit cache
         if key in cache:
             atividades = cache.get(key)
-            return Response(atividades)
-        result = get_url(url)
-        if "error" in result and result["error"]:
-            return Response({"error": "Something went wrong. Try again later."})
-        cache.set(key, result, timeout=CACHE_TTL_LONG)
-        return Response(result)
+            return ResponseWithDeprecationHeaders(atividades)
+        try:
+            result = get_url(url)
+            if "error" in result and result["error"]:
+                return ResponseWithDeprecationHeaders(
+                    {"error": "Something went wrong. Try again later."}
+                )
+            cache.set(key, result, timeout=CACHE_TTL_LONG)
+            return ResponseWithDeprecationHeaders(result)
+        except Exception:
+            return ResponseWithDeprecationHeaders(
+                {"error": "Something went wrong. Try again later."}
+            )
