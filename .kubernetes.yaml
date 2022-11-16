@@ -60,6 +60,13 @@ spec:
                 - kill -0 $(cat /run/nginx.pid)
             initialDelaySeconds: 5
             periodSeconds: 10
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
       restartPolicy: Always
       volumes:
         - name: django-logs
