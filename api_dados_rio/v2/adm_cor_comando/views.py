@@ -143,13 +143,18 @@ class PopsView(LoggingMixin, ViewSet):
         }
         ```
 
-        **Política de cache**: O resultado é armazenado em cache por um período de 5 minutos.
+        **Política de cache**: O resultado é armazenado em cache por um período de 5 minutos. Nesse
+        sentido, requisições feitas com intervalo menor que 5 minutos tendem a retornar o mesmo
+        resultado. Após 5 minutos, caso não seja possível obter atualizações na origem, essa API
+        responderá com o último resultado obtido, inserindo também uma chave `error` no resultado
+        dizendo `Failed to fetch new data, using backup cached data.`.
         """,
     ),
 )
 class EventosAbertosView(LoggingMixin, ViewSet):
     def list(self, request):
         key = "eventos_abertos"
+        key_backup = "eventos_abertos_backup"
         url = getattr(settings, "API_URL_LIST_EVENTOS_ABERTOS")
         # Hit cache
         if key in cache:
@@ -158,13 +163,24 @@ class EventosAbertosView(LoggingMixin, ViewSet):
         try:
             result = get_url(url)
             if "error" in result and result["error"]:
+                if key_backup in cache:
+                    result = cache.get(key_backup)
+                    result[
+                        "error"
+                    ] = "Failed to fetch new data, using backup cached data."
+                    return ResponseWithDeprecationHeaders(result)
                 return ResponseWithDeprecationHeaders(
                     {"error": "Something went wrong. Try again later."},
                     status=500,
                 )
             cache.set(key, result, timeout=CACHE_TTL_SHORT)
+            cache.set(key_backup, result, timeout=None)
             return ResponseWithDeprecationHeaders(result)
         except Exception:
+            if key_backup in cache:
+                result = cache.get(key_backup)
+                result["error"] = "Failed to fetch new data, using backup cached data."
+                return ResponseWithDeprecationHeaders(result)
             return ResponseWithDeprecationHeaders(
                 {"error": "Something went wrong. Try again later."},
                 status=500,
