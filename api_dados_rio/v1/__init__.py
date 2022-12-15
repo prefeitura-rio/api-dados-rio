@@ -22,3 +22,13 @@ def v1_deprecation_headers():
     return {
         "Deprecation": "2022-12-31 23:59:59",
     }
+
+
+def v1_deprecated_message() -> str:
+    """
+    Returns the message to be returned when the API version is deprecated.
+    """
+    return (
+        "This API version is deprecated. Please refer to the documentation "
+        "at https://api.dados.rio/docs/ for more information."
+    )

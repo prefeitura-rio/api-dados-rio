@@ -15,7 +15,11 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework_tracking.mixins import LoggingMixin
 
-from api_dados_rio.v1 import v1_deprecated, v1_deprecation_headers
+from api_dados_rio.v1 import (
+    v1_deprecated,
+    v1_deprecated_message,
+    v1_deprecation_headers,
+)
 
 # Cache timeout
 CACHE_TTL_SHORT = getattr(settings, "CACHE_TTL_SHORT", DEFAULT_TIMEOUT)
@@ -67,7 +71,8 @@ def get_url(url, parameters: dict = None, token: str = None):  # pylint: disable
         deprecated=v1_deprecated(),
         operation_summary="Lista todos os POPs (Procedimento Operacional Padrão)",
         operation_description="""
-        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
+        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023. Esse endpoint
+        será substituído pelo endpoint "/v2/adm_cor_comando/pops/".
 
         **Resultado**: Retorna uma lista contendo todos os POPs existentes com o seguinte formato:
 
@@ -91,6 +96,11 @@ def get_url(url, parameters: dict = None, token: str = None):  # pylint: disable
 )
 class PopsView(LoggingMixin, ViewSet):
     def list(self, request):
+        if v1_deprecated():
+            return ResponseWithDeprecationHeaders(
+                {"error": v1_deprecated_message()},
+                status=410,
+            )
         key = "pops"
         url = getattr(settings, "API_URL_LIST_POPS")
         # Hit cache
@@ -119,7 +129,8 @@ class PopsView(LoggingMixin, ViewSet):
         deprecated=v1_deprecated(),
         operation_summary="Lista todos os eventos abertos no momento",
         operation_description="""
-        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
+        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023. Esse endpoint
+        será substituído pelo endpoint "/v2/adm_cor_comando/ocorrencias_abertas/".
 
         **Resultado**: Retorna uma lista contendo todos os eventos abertos com o seguinte formato:
 
@@ -153,6 +164,11 @@ class PopsView(LoggingMixin, ViewSet):
 )
 class EventosAbertosView(LoggingMixin, ViewSet):
     def list(self, request):
+        if v1_deprecated():
+            return ResponseWithDeprecationHeaders(
+                {"error": v1_deprecated_message()},
+                status=410,
+            )
         key = "eventos_abertos"
         url = getattr(settings, "API_URL_LIST_EVENTOS_ABERTOS")
         # Hit cache
@@ -181,7 +197,8 @@ class EventosAbertosView(LoggingMixin, ViewSet):
         deprecated=v1_deprecated(),
         operation_summary="Lista todos os eventos de acordo com os parâmetros informados",
         operation_description="""
-        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
+        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023. Esse endpoint
+        será substituído pelo endpoint "/v2/adm_cor_comando/ocorrencias/".
 
         **Resultado**: Retorna uma lista contendo eventos com o seguinte formato:
 
@@ -231,6 +248,11 @@ class EventosAbertosView(LoggingMixin, ViewSet):
 )
 class EventosView(LoggingMixin, ViewSet):
     def list(self, request: Request):
+        if v1_deprecated():
+            return ResponseWithDeprecationHeaders(
+                {"error": v1_deprecated_message()},
+                status=410,
+            )
         # Set some date formats we're going to use
         date_format = "%Y-%m-%d %H:%M:%S.0"
         redis_date_format = "%Y_%m_%d"
@@ -354,7 +376,8 @@ class EventosView(LoggingMixin, ViewSet):
         deprecated=v1_deprecated(),
         operation_summary="Lista as atividades relacionadas a um evento",
         operation_description="""
-        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
+        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023. Esse endpoint
+        será substituído pelo endpoint "/v2/adm_cor_comando/ocorrencias_orgaos_responsaveis/".
 
         **Resultado**: Retorna uma lista contendo atividades de um evento com o seguinte formato:
 
@@ -389,6 +412,11 @@ class EventosView(LoggingMixin, ViewSet):
 )
 class AtividadesEventoView(LoggingMixin, ViewSet):
     def list(self, request):
+        if v1_deprecated():
+            return ResponseWithDeprecationHeaders(
+                {"error": v1_deprecated_message()},
+                status=410,
+            )
         base_key = "atividades_evento"
         base_url = getattr(settings, "API_URL_LIST_ATIVIDADES_EVENTOS")
         evento_id = request.query_params.get("eventoId")
@@ -420,7 +448,9 @@ class AtividadesEventoView(LoggingMixin, ViewSet):
         deprecated=v1_deprecated(),
         operation_summary="Lista as atividades relacionadas a um POP",
         operation_description="""
-        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023.
+        **Aviso:** Essa versão da API será descontinuada a partir de 01/01/2023. Esse endpoint
+        será substituído pelo endpoint
+        "/v2/adm_cor_comando/procedimento_operacional_padrao_orgaos_responsaveis/".
 
         **Resultado**: Retorna uma lista contendo atividades de um POP com o seguinte formato:
 
@@ -453,6 +483,11 @@ class AtividadesEventoView(LoggingMixin, ViewSet):
 )
 class AtividadesPopView(LoggingMixin, ViewSet):
     def list(self, request):
+        if v1_deprecated():
+            return ResponseWithDeprecationHeaders(
+                {"error": v1_deprecated_message()},
+                status=410,
+            )
         base_key = "atividades_pop"
         base_url = getattr(settings, "API_URL_LIST_ATIVIDADES_POP")
         pop_id = request.query_params.get("popId")
