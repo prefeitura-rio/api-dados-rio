@@ -4,4 +4,4 @@ from django.apps import AppConfig
 
 class ComandoConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "api_dados_rio.v1.cor.comando"
+    name = "api_dados_rio.v2.adm_cor_comando"

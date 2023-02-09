@@ -15,21 +15,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework_tracking.mixins import LoggingMixin
 
-from api_dados_rio.v1 import v1_deprecated, v1_deprecation_headers
-
 # Cache timeout
 CACHE_TTL_SHORT = getattr(settings, "CACHE_TTL_SHORT", DEFAULT_TIMEOUT)
 CACHE_TTL_LONG = getattr(settings, "CACHE_TTL_LONG", DEFAULT_TIMEOUT)
-
-
-class ResponseWithDeprecationHeaders(Response):
-    """Response with deprecation headers"""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        deprecation_headers = v1_deprecation_headers()
-        for header, value in deprecation_headers.items():
-            self[header] = value
 
 
 def get_token():
@@ -64,7 +52,6 @@ def get_url(url, parameters: dict = None, token: str = None):  # pylint: disable
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
-        deprecated=v1_deprecated(),
         operation_summary="Lista todos os POPs (Procedimento Operacional Padrão)",
         operation_description="""
         **Resultado**: Retorna uma lista contendo todos os POPs existentes com o seguinte formato:
@@ -94,18 +81,18 @@ class PopsView(LoggingMixin, ViewSet):
         # Hit cache
         if key in cache:
             pops = cache.get(key)
-            return ResponseWithDeprecationHeaders(pops)
+            return Response(pops)
         try:
             result = get_url(url)
             if "error" in result and result["error"]:
-                return ResponseWithDeprecationHeaders(
+                return Response(
                     {"error": "Something went wrong. Try again later."},
                     status=500,
                 )
             cache.set(key, result, timeout=CACHE_TTL_LONG)
-            return ResponseWithDeprecationHeaders(result)
+            return Response(result)
         except Exception:
-            return ResponseWithDeprecationHeaders(
+            return Response(
                 {"error": "Something went wrong. Try again later."},
                 status=500,
             )
@@ -114,7 +101,6 @@ class PopsView(LoggingMixin, ViewSet):
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
-        deprecated=v1_deprecated(),
         operation_summary="Lista todos os eventos abertos no momento",
         operation_description="""
         **Resultado**: Retorna uma lista contendo todos os eventos abertos com o seguinte formato:
@@ -159,7 +145,7 @@ class EventosAbertosView(LoggingMixin, ViewSet):
         # Hit cache
         if key in cache:
             pops = cache.get(key)
-            return ResponseWithDeprecationHeaders(pops)
+            return Response(pops)
         try:
             result = get_url(url)
             if "error" in result and result["error"]:
@@ -168,20 +154,20 @@ class EventosAbertosView(LoggingMixin, ViewSet):
                     result[
                         "error"
                     ] = "Failed to fetch new data, using backup cached data."
-                    return ResponseWithDeprecationHeaders(result)
-                return ResponseWithDeprecationHeaders(
+                    return Response(result)
+                return Response(
                     {"error": "Something went wrong. Try again later."},
                     status=500,
                 )
             cache.set(key, result, timeout=CACHE_TTL_SHORT)
             cache.set(key_backup, result, timeout=None)
-            return ResponseWithDeprecationHeaders(result)
+            return Response(result)
         except Exception:
             if key_backup in cache:
                 result = cache.get(key_backup)
                 result["error"] = "Failed to fetch new data, using backup cached data."
-                return ResponseWithDeprecationHeaders(result)
-            return ResponseWithDeprecationHeaders(
+                return Response(result)
+            return Response(
                 {"error": "Something went wrong. Try again later."},
                 status=500,
             )
@@ -190,7 +176,6 @@ class EventosAbertosView(LoggingMixin, ViewSet):
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
-        deprecated=v1_deprecated(),
         operation_summary="Lista todos os eventos de acordo com os parâmetros informados",
         operation_description="""
         **Resultado**: Retorna uma lista contendo eventos com o seguinte formato:
@@ -252,7 +237,7 @@ class EventosView(LoggingMixin, ViewSet):
         # First parameter is the start date, this is required
         inicio = parameters.get("inicio")
         if not inicio:
-            return ResponseWithDeprecationHeaders(
+            return Response(
                 {"error": 'Parameter "inicio" is required.'},
                 status=400,
             )
@@ -260,7 +245,7 @@ class EventosView(LoggingMixin, ViewSet):
         try:
             inicio = datetime.strptime(inicio, date_format)
         except ValueError:
-            return ResponseWithDeprecationHeaders(
+            return Response(
                 {"error": f'Parameter "inicio" must be in format {date_format}.'},
                 status=400,
             )
@@ -273,14 +258,14 @@ class EventosView(LoggingMixin, ViewSet):
             try:
                 fim = datetime.strptime(fim, date_format)
             except ValueError:
-                return ResponseWithDeprecationHeaders(
+                return Response(
                     {"error": f'Parameter "fim" must be in format {date_format}.'},
                     status=400,
                 )
             fim = fim.replace(hour=0, minute=0, second=0, microsecond=0)
             # Date diff must be less than or equal to 30 days
             if (fim - inicio) > timedelta(days=30):
-                return ResponseWithDeprecationHeaders(
+                return Response(
                     {"error": "(fim - inicio) must be less than or equal to 30 days."},
                     status=400,
                 )
@@ -313,7 +298,7 @@ class EventosView(LoggingMixin, ViewSet):
                 max_date = date
         # If we have everything in cache, return it
         if not min_date and not max_date:
-            return ResponseWithDeprecationHeaders(results)
+            return Response(results)
         if min_date == max_date:
             max_date += timedelta(days=1)
         # If we don't, fetch data for the date range we're missing
@@ -325,7 +310,7 @@ class EventosView(LoggingMixin, ViewSet):
             result = get_url(url, parameters=date_range)
             # If something happened, just return a 500
             if "error" in result and result["error"]:
-                return ResponseWithDeprecationHeaders(
+                return Response(
                     {"error": "Something went wrong. Try again later."},
                     status=500,
                 )
@@ -350,9 +335,9 @@ class EventosView(LoggingMixin, ViewSet):
             for date, eventos in cache_dates.items():
                 key = f"{base_key}_{date.strftime(redis_date_format)}"
                 cache.set(key, {"eventos": eventos}, timeout=CACHE_TTL_SHORT)
-            return ResponseWithDeprecationHeaders(results)
+            return Response(results)
         except Exception:
-            return ResponseWithDeprecationHeaders(
+            return Response(
                 {"error": "Something went wrong. Try again later."},
                 status=500,
             )
@@ -361,7 +346,6 @@ class EventosView(LoggingMixin, ViewSet):
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
-        deprecated=v1_deprecated(),
         operation_summary="Lista as atividades relacionadas a um evento",
         operation_description="""
         **Resultado**: Retorna uma lista contendo atividades de um evento com o seguinte formato:
@@ -401,31 +385,26 @@ class AtividadesEventoView(LoggingMixin, ViewSet):
         base_url = getattr(settings, "API_URL_LIST_ATIVIDADES_EVENTOS")
         evento_id = request.query_params.get("eventoId")
         if not evento_id:
-            return ResponseWithDeprecationHeaders({"error": "eventoId is required."})
+            return Response({"error": "eventoId is required."})
         key = f"{base_key}_{evento_id}"
         url = f"{base_url}?eventoId={evento_id}"
         # Hit cache
         if key in cache:
             atividades = cache.get(key)
-            return ResponseWithDeprecationHeaders(atividades)
+            return Response(atividades)
         try:
             result = get_url(url)
             if "error" in result and result["error"]:
-                return ResponseWithDeprecationHeaders(
-                    {"error": "Something went wrong. Try again later."}
-                )
+                return Response({"error": "Something went wrong. Try again later."})
             cache.set(key, result, timeout=CACHE_TTL_SHORT)
-            return ResponseWithDeprecationHeaders(result)
+            return Response(result)
         except Exception:
-            return ResponseWithDeprecationHeaders(
-                {"error": "Something went wrong. Try again later."}
-            )
+            return Response({"error": "Something went wrong. Try again later."})
 
 
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
-        deprecated=v1_deprecated(),
         operation_summary="Lista as atividades relacionadas a um POP",
         operation_description="""
         **Resultado**: Retorna uma lista contendo atividades de um POP com o seguinte formato:
@@ -463,22 +442,18 @@ class AtividadesPopView(LoggingMixin, ViewSet):
         base_url = getattr(settings, "API_URL_LIST_ATIVIDADES_POP")
         pop_id = request.query_params.get("popId")
         if not pop_id:
-            return ResponseWithDeprecationHeaders({"error": "popId is required."})
+            return Response({"error": "popId is required."})
         key = f"{base_key}_{pop_id}"
         url = f"{base_url}?popId={pop_id}"
         # Hit cache
         if key in cache:
             atividades = cache.get(key)
-            return ResponseWithDeprecationHeaders(atividades)
+            return Response(atividades)
         try:
             result = get_url(url)
             if "error" in result and result["error"]:
-                return ResponseWithDeprecationHeaders(
-                    {"error": "Something went wrong. Try again later."}
-                )
+                return Response({"error": "Something went wrong. Try again later."})
             cache.set(key, result, timeout=CACHE_TTL_LONG)
-            return ResponseWithDeprecationHeaders(result)
+            return Response(result)
         except Exception:
-            return ResponseWithDeprecationHeaders(
-                {"error": "Something went wrong. Try again later."}
-            )
+            return Response({"error": "Something went wrong. Try again later."})
