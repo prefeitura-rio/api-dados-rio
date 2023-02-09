@@ -152,7 +152,7 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.AnonRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "1/second",
+        "anon": "60/minute",
     },
     "PAGE_SIZE": 20,
 }
