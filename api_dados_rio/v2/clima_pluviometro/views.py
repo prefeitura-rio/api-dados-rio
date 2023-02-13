@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from os import getenv
+from typing import Any, Dict, List
 
 from django.core.cache import cache
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
@@ -12,6 +13,50 @@ from rest_framework.viewsets import ViewSet
 from rest_framework_tracking.mixins import LoggingMixin
 
 CACHE_TTL_SHORT = getattr(settings, "CACHE_TTL_SHORT", DEFAULT_TIMEOUT)
+
+
+def get_data_from_cache(
+    return_data: str,
+    data_key: str = "data_last_15min_rain",
+    data_cache_key: str = "cache_last_15min_rain",
+    last_update_key: str = "data_last_15min_rain_update",
+    last_update_cache_key: str = "cache_last_15min_rain_update",
+) -> List[Dict[str, Any]]:
+    if return_data not in ["data", "last_update"]:
+        raise ValueError("return_data must be 'data' or 'last_update'")
+    if data_cache_key in cache and last_update_cache_key in cache:
+        if return_data == "data":
+            data = cache.get(data_cache_key)
+            return data
+        elif return_data == "last_update":
+            last_update = cache.get(last_update_cache_key)
+            return last_update
+    try:
+        redis_url = getenv("REDIS_URL")
+        assert redis_url is not None
+        redis = RedisPal.from_url(redis_url)
+        # Get data and set cache
+        data = redis.get(data_key)
+        assert data is not None
+        assert isinstance(data, list)
+        assert len(data) > 0
+        cache.set(data_cache_key, data, timeout=CACHE_TTL_SHORT)
+        # Get last update and set cache
+        data = redis.get(last_update_key)
+        assert data is not None
+        assert isinstance(data, list)
+        assert len(data) > 0
+        result = data[0]
+        assert "last_update" in result
+        last_update = result["last_update"]
+        last_update_str = last_update.strftime("%d/%m/%Y %H:%M:%S")
+        cache.set(last_update_cache_key, last_update_str, timeout=CACHE_TTL_SHORT)
+        if return_data == "data":
+            return data
+        elif return_data == "last_update":
+            return last_update_str
+    except Exception:
+        return []
 
 
 @method_decorator(
@@ -42,26 +87,13 @@ CACHE_TTL_SHORT = getattr(settings, "CACHE_TTL_SHORT", DEFAULT_TIMEOUT)
 )
 class Last15MinRainView(LoggingMixin, ViewSet):
     def list(self, request):
-        cache_key = "cache_last_15min_rain"
-        data_key = "data_last_15min_rain"
-        if cache_key in cache:
-            data = cache.get(cache_key)
+        data = get_data_from_cache("data")
+        if data != []:
             return Response(data)
-        try:
-            redis_url = getenv("REDIS_URL")
-            assert redis_url is not None
-            redis = RedisPal.from_url(redis_url)
-            data = redis.get(data_key)
-            assert data is not None
-            assert isinstance(data, list)
-            assert len(data) > 0
-            cache.set(cache_key, data, timeout=CACHE_TTL_SHORT)
-            return Response(data)
-        except Exception:
-            return Response(
-                {"error": "Something went wrong. Try again later."},
-                status=500,
-            )
+        return Response(
+            {"error": "Something went wrong. Try again later."},
+            status=500,
+        )
 
 
 @method_decorator(
@@ -81,28 +113,10 @@ class Last15MinRainView(LoggingMixin, ViewSet):
 )
 class LastUpdateRainView(LoggingMixin, ViewSet):
     def list(self, request):
-        rain_cache_key = "cache_last_15min_rain"
-        cache_key = "cache_last_15min_rain_update"
-        data_key = "data_last_15min_rain_update"
-        if rain_cache_key in cache and cache_key in cache:
-            data = cache.get(cache_key)
-            return Response(data)
-        try:
-            redis_url = getenv("REDIS_URL")
-            assert redis_url is not None
-            redis = RedisPal.from_url(redis_url)
-            data = redis.get(data_key)
-            assert data is not None
-            assert isinstance(data, list)
-            assert len(data) > 0
-            result = data[0]
-            assert "last_update" in result
-            last_update = result["last_update"]
-            last_update_str = last_update.strftime("%d/%m/%Y %H:%M:%S")
-            cache.set(cache_key, last_update_str, timeout=CACHE_TTL_SHORT)
-            return Response(last_update_str)
-        except Exception:
-            return Response(
-                {"error": "Something went wrong. Try again later."},
-                status=500,
-            )
+        last_update = get_data_from_cache("last_update")
+        if last_update != []:
+            return Response(last_update)
+        return Response(
+            {"error": "Something went wrong. Try again later."},
+            status=500,
+        )
