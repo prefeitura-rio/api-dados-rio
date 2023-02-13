@@ -84,7 +84,7 @@ class LastUpdateRainView(LoggingMixin, ViewSet):
         rain_cache_key = "cache_last_15min_rain"
         cache_key = "cache_last_15min_rain_update"
         data_key = "data_last_15min_rain_update"
-        if rain_cache_key in cache:
+        if rain_cache_key in cache and cache_key in cache:
             data = cache.get(cache_key)
             return Response(data)
         try:
