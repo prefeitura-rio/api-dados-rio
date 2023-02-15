@@ -46,6 +46,13 @@ INSTALLED_APPS = [
     "rest_framework_tracking",
     "drf_yasg",
     "api_dados_rio.v1.cor.comando",
+    "health_check",
+    "health_check.db",
+    "health_check.cache",
+    "health_check.storage",
+    "health_check.contrib.migrations",
+    "health_check.contrib.psutil",
+    "health_check.contrib.redis",
 ]
 
 MIDDLEWARE = [
@@ -202,3 +209,9 @@ API_URL_LIST_EVENTOS_ABERTOS = getenv("API_URL_LIST_EVENTOS_ABERTOS", "")
 API_URL_LIST_EVENTOS = getenv("API_URL_LIST_EVENTOS", "")
 API_URL_LIST_ATIVIDADES_EVENTOS = getenv("API_URL_LIST_ATIVIDADES_EVENTOS", "")
 API_URL_LIST_ATIVIDADES_POP = getenv("API_URL_LIST_ATIVIDADES_POP", "")
+
+# Health check configurations
+HEALTH_CHECK = {
+    "MEMORY_MIN": None,
+    "DISK_USAGE_MAX": None,
+}
