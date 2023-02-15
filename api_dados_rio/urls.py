@@ -25,12 +25,17 @@ from api_dados_rio.custom.routers import IndexRouter
 from api_dados_rio.v1.urls import urlpatterns as v1_urlpatterns
 from api_dados_rio.v2.urls import urlpatterns as v2_urlpatterns
 
+# flake8: noqa: E501
 
 schema_view = get_schema_view(
     openapi.Info(
         title="API Dados Rio",
         default_version="v2",
-        description="API de dados públicos do Escritório de Dados",
+        description="""
+        API de dados públicos do Escritório de Dados.
+
+        Em caso de dúvidas, sugestões ou reclamações, favor entrar em contato por um de nossos canais oficiais (https://docs.dados.rio/contato/) ou através do formulário em https://share.dados.rio/services-form.
+        """,
         terms_of_service="",
         contact=openapi.Contact(email="escritoriodedados@gmail.com"),
         license=openapi.License(name="GPLv3"),
