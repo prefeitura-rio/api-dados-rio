@@ -168,12 +168,18 @@ REST_FRAMEWORK = {
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        "require_not_502": {
+            "()": "api_dados_rio.custom.logging_filters.RequireNot502",
+        },
+    },
     "handlers": {
         # Include the default Django email handler for errors
         # This is what you'd get without configuring logging at all.
         "mail_admins": {
             "class": "django.utils.log.AdminEmailHandler",
             "level": "ERROR",
+            "filters": ["require_not_502"],
             # But the emails are plain text by default - HTML is nicer
             "include_html": True,
         },
