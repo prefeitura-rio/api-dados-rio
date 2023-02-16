@@ -288,7 +288,7 @@ class EventosView(LoggingMixin, ViewSet):
             if key in cache:
                 result = cache.get(key)
                 if result and "eventos" in result:
-                    results["eventos"].append(result)
+                    results["eventos"].extend(result["eventos"])
                     from_cache.append(date)
                     continue
             # We're not in cache, save the date to use as a parameter
@@ -299,9 +299,9 @@ class EventosView(LoggingMixin, ViewSet):
         # If we have everything in cache, return it
         if not min_date and not max_date:
             return Response(results)
+        # If we don't, fetch data for the date range we're missing
         if min_date == max_date:
             max_date += timedelta(days=1)
-        # If we don't, fetch data for the date range we're missing
         date_range = {
             "inicio": min_date.strftime(date_format),
             "fim": max_date.strftime(date_format),
