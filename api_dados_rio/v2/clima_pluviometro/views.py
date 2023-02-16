@@ -72,7 +72,7 @@ class Last15MinRainView(LoggingMixin, ViewSet):
 )
 class LastUpdateRainView(LoggingMixin, ViewSet):
     def list(self, request):
-        last_update_key = "data_last_15min_rain"
+        last_update_key = "data_last_15min_rain_update"
         try:
             redis_url = getenv("REDIS_URL")
             assert redis_url is not None
