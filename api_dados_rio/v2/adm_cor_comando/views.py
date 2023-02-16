@@ -8,6 +8,7 @@ from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+import pendulum
 import requests
 from requests.adapters import HTTPAdapter, Retry
 from rest_framework.request import Request
@@ -81,16 +82,18 @@ class PopsView(LoggingMixin, ViewSet):
         # Hit cache
         if key in cache:
             pops = cache.get(key)
-            return Response(pops)
+            return Response(pops, status=200)
         try:
             result = get_url(url)
             if "error" in result and result["error"]:
                 return Response(
-                    {"error": "Something went wrong. Try again later."},
-                    status=500,
+                    {
+                        "error": "The upstream server (in this case, the original COR API) is not responding."  # noqa
+                    },
+                    status=502,
                 )
             cache.set(key, result, timeout=CACHE_TTL_LONG)
-            return Response(result)
+            return Response(result, status=200)
         except Exception:
             return Response(
                 {"error": "Something went wrong. Try again later."},
@@ -141,11 +144,12 @@ class EventosAbertosView(LoggingMixin, ViewSet):
     def list(self, request):
         key = "eventos_abertos"
         key_backup = "eventos_abertos_backup"
+        key_backup_last_updated = "eventos_abertos_backup_last_updated"
         url = getattr(settings, "API_URL_LIST_EVENTOS_ABERTOS")
         # Hit cache
         if key in cache:
             pops = cache.get(key)
-            return Response(pops)
+            return Response(pops, status=200)
         try:
             result = get_url(url)
             if "error" in result and result["error"]:
@@ -154,19 +158,29 @@ class EventosAbertosView(LoggingMixin, ViewSet):
                     result[
                         "error"
                     ] = "Failed to fetch new data, using backup cached data."
-                    return Response(result)
+                    return Response(result, status=200)
                 return Response(
-                    {"error": "Something went wrong. Try again later."},
-                    status=500,
+                    {
+                        "error": "The upstream server (in this case, the original COR API) is not responding."  # noqa
+                    },
+                    status=502,
                 )
             cache.set(key, result, timeout=CACHE_TTL_SHORT)
             cache.set(key_backup, result, timeout=None)
-            return Response(result)
+            cache.set(
+                key_backup_last_updated,
+                pendulum.now(tz=settings.TIME_ZONE).strftime("%Y-%m-%d %H:%M:%S"),
+                timeout=None,
+            )
+            return Response(result, status=200)
         except Exception:
             if key_backup in cache:
                 result = cache.get(key_backup)
-                result["error"] = "Failed to fetch new data, using backup cached data."
-                return Response(result)
+                last_update = cache.get(key_backup_last_updated)
+                result[
+                    "error"
+                ] = f"Failed to fetch new data, using backup cached data from {last_update}."
+                return Response(result, status=200)
             return Response(
                 {"error": "Something went wrong. Try again later."},
                 status=500,
@@ -298,7 +312,7 @@ class EventosView(LoggingMixin, ViewSet):
                 max_date = date
         # If we have everything in cache, return it
         if not min_date and not max_date:
-            return Response(results)
+            return Response(results, status=200)
         # If we don't, fetch data for the date range we're missing
         if min_date == max_date:
             max_date += timedelta(days=1)
@@ -311,8 +325,10 @@ class EventosView(LoggingMixin, ViewSet):
             # If something happened, just return a 500
             if "error" in result and result["error"]:
                 return Response(
-                    {"error": "Something went wrong. Try again later."},
-                    status=500,
+                    {
+                        "error": "The upstream server (in this case, the original COR API) is not responding."  # noqa
+                    },
+                    status=502,
                 )
             # Now we need to check for overlaps in data (and also cache it)
             cache_dates: Dict[str, List] = {}
@@ -335,7 +351,7 @@ class EventosView(LoggingMixin, ViewSet):
             for date, eventos in cache_dates.items():
                 key = f"{base_key}_{date.strftime(redis_date_format)}"
                 cache.set(key, {"eventos": eventos}, timeout=CACHE_TTL_SHORT)
-            return Response(results)
+            return Response(results, status=200)
         except Exception:
             return Response(
                 {"error": "Something went wrong. Try again later."},
@@ -385,21 +401,28 @@ class AtividadesEventoView(LoggingMixin, ViewSet):
         base_url = getattr(settings, "API_URL_LIST_ATIVIDADES_EVENTOS")
         evento_id = request.query_params.get("eventoId")
         if not evento_id:
-            return Response({"error": "eventoId is required."})
+            return Response({"error": "eventoId is required."}, status=400)
         key = f"{base_key}_{evento_id}"
         url = f"{base_url}?eventoId={evento_id}"
         # Hit cache
         if key in cache:
             atividades = cache.get(key)
-            return Response(atividades)
+            return Response(atividades, status=200)
         try:
             result = get_url(url)
             if "error" in result and result["error"]:
-                return Response({"error": "Something went wrong. Try again later."})
+                return Response(
+                    {
+                        "error": "The upstream server (in this case, the original COR API) is not responding."  # noqa
+                    },
+                    status=502,
+                )
             cache.set(key, result, timeout=CACHE_TTL_SHORT)
-            return Response(result)
+            return Response(result, status=200)
         except Exception:
-            return Response({"error": "Something went wrong. Try again later."})
+            return Response(
+                {"error": "Something went wrong. Try again later."}, status=500
+            )
 
 
 @method_decorator(
@@ -442,18 +465,25 @@ class AtividadesPopView(LoggingMixin, ViewSet):
         base_url = getattr(settings, "API_URL_LIST_ATIVIDADES_POP")
         pop_id = request.query_params.get("popId")
         if not pop_id:
-            return Response({"error": "popId is required."})
+            return Response({"error": "popId is required."}, status=400)
         key = f"{base_key}_{pop_id}"
         url = f"{base_url}?popId={pop_id}"
         # Hit cache
         if key in cache:
             atividades = cache.get(key)
-            return Response(atividades)
+            return Response(atividades, status=200)
         try:
             result = get_url(url)
             if "error" in result and result["error"]:
-                return Response({"error": "Something went wrong. Try again later."})
+                return Response(
+                    {
+                        "error": "The upstream server (in this case, the original COR API) is not responding."  # noqa
+                    },
+                    status=502,
+                )
             cache.set(key, result, timeout=CACHE_TTL_LONG)
-            return Response(result)
+            return Response(result, status=200)
         except Exception:
-            return Response({"error": "Something went wrong. Try again later."})
+            return Response(
+                {"error": "Something went wrong. Try again later."}, status=500
+            )
