@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, timedelta
 from os import getenv
 from typing import Any, Dict, List
 
@@ -12,7 +13,26 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework_tracking.mixins import LoggingMixin
 
-CACHE_TTL_SHORT = getattr(settings, "CACHE_TTL_SHORT", DEFAULT_TIMEOUT)
+
+def get_next_update_datetime(base_datetime: datetime = None):
+    """
+    Updates are done in the following minutes: 8, 18, 28, 38, 48, 58
+    We need to calculate the next update time based on the base datetime.
+    """
+    base_datetime = base_datetime or datetime.now()
+    next_update = base_datetime.replace(minute=8, second=0, microsecond=0)
+    while next_update <= base_datetime:
+        next_update += timedelta(minutes=10)
+    return next_update
+
+
+def get_cache_ttl_seconds(base_datetime: datetime = None):
+    """
+    Cache TTL is the difference between the next update time and the base datetime.
+    """
+    base_datetime = base_datetime or datetime.now()
+    next_update = get_next_update_datetime(base_datetime)
+    return (next_update - base_datetime).total_seconds()
 
 
 def get_data_from_cache(
@@ -32,6 +52,7 @@ def get_data_from_cache(
             last_update = cache.get(last_update_cache_key)
             return last_update
     try:
+        cache_ttl = get_cache_ttl_seconds()
         redis_url = getenv("REDIS_URL")
         assert redis_url is not None
         redis = RedisPal.from_url(redis_url)
@@ -40,7 +61,7 @@ def get_data_from_cache(
         assert data is not None
         assert isinstance(data, list)
         assert len(data) > 0
-        cache.set(data_cache_key, data, timeout=CACHE_TTL_SHORT)
+        cache.set(data_cache_key, data, timeout=cache_ttl)
         # Get last update and set cache
         data = redis.get(last_update_key)
         assert data is not None
@@ -50,7 +71,7 @@ def get_data_from_cache(
         assert "last_update" in result
         last_update = result["last_update"]
         last_update_str = last_update.strftime("%d/%m/%Y %H:%M:%S")
-        cache.set(last_update_cache_key, last_update_str, timeout=CACHE_TTL_SHORT)
+        cache.set(last_update_cache_key, last_update_str, timeout=cache_ttl)
         if return_data == "data":
             return data
         elif return_data == "last_update":
