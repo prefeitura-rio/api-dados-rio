@@ -1,4 +1,20 @@
 ---
+# HPA
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-dados-rio
+  namespace: api-dados-rio
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-dados-rio
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 50
+
+---
 # Deployment
 apiVersion: apps/v1
 kind: Deployment
