@@ -12,10 +12,10 @@ from rest_framework_tracking.mixins import LoggingMixin
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
-        operation_summary="Retorna a quantidade de chuva precipitada em cada hexágono (H3)",
+        operation_summary="Retorna a quantidade de alagamentos em cada hexágono (H3)",
         operation_description="""
         **Resultado**: Retorna uma lista contendo todos os hexágonos (H3) com a quantidade de alagamento
-        para os últimos 15 minutos, em milímetros (mm):
+        para os últimos 15 minutos em cada um:
 
         ```json
         [
@@ -58,9 +58,9 @@ class Last15MinRainView(LoggingMixin, ViewSet):
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
-        operation_summary="Retorna o horário de atualização dos dados de chuva",
+        operation_summary="Retorna o horário de atualização dos dados de alagamento",
         operation_description="""
-        **Resultado**: Retorna um texto contendo o horário de atualização dos dados de chuva:
+        **Resultado**: Retorna um texto contendo o horário de atualização dos dados de alagamento:
 
         ```
         ""
