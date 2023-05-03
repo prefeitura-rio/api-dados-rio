@@ -6,11 +6,21 @@ from . import views
 router = routers.DefaultRouter()
 router.register(
     r"alagamento_15min",
-    views.Last15MinRainView,
+    views.Last15MinFloodView,
     basename="alagamento_15min",
 )
 router.register(
     r"ultima_atualizacao_alagamento_15min",
-    views.LastUpdateRainView,
+    views.LastUpdate15MinFloodView,
     basename="ultima_atualizacao_alagamento_15min",
+)
+router.register(
+    r"alagamento_120min",
+    views.Last120MinFloodView,
+    basename="alagamento_120min",
+)
+router.register(
+    r"ultima_atualizacao_alagamento_120min",
+    views.LastUpdate120MinFloodView,
+    basename="ultima_atualizacao_alagamento_120min",
 )

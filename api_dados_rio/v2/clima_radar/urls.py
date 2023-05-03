@@ -14,3 +14,13 @@ router.register(
     views.LastUpdateRainView,
     basename="ultima_atualizacao_precipitacao_15min",
 )
+router.register(
+    r"precipitacao_120min",
+    views.Last120MinRainView,
+    basename="precipitacao_120min",
+)
+router.register(
+    r"ultima_atualizacao_precipitacao_120min",
+    views.LastUpdate120MinRainView,
+    basename="ultima_atualizacao_precipitacao_120min",
+)
