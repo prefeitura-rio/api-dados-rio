@@ -222,7 +222,6 @@ class AIFloodingDetectionView(LoggingMixin, ViewSet):
             data = redis.get(data_key)
             assert data is not None
             assert isinstance(data, list)
-            assert len(data) > 0
             return Response(data)
         except Exception:
             return Response(
@@ -248,6 +247,7 @@ class LastUpdateAIFloodingDetectionView(LoggingMixin, ViewSet):
             assert redis_url is not None
             redis = RedisPal.from_url(redis_url)
             data = redis.get(last_update_key)
+            assert data is not None
             return Response(data)
         except Exception:
             return Response(
