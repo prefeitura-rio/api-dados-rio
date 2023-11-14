@@ -177,3 +177,80 @@ class LastUpdate120MinFloodView(LoggingMixin, ViewSet):
                 {"error": "Something went wrong. Try again later."},
                 status=500,
             )
+
+
+@method_decorator(
+    name="list",
+    decorator=swagger_auto_schema(
+        operation_summary="Retorna os pontos de alagamento detectados por IA.",
+        operation_description="""
+        **Resultado**: Retorna uma lista contendo todos os pontos de alagamento detectados por IA
+        no seguinte formato:
+
+        ```json
+        [
+            {
+                "datetime": "",
+                "id_camera": "",
+                "url_camera": "",
+                "latitude": 0.0,
+                "longitude": 0.0,
+                "image_base64": "",
+                "ai_classification": [
+                    {
+                        "object": "alagamento",
+                        "label": false,
+                        "confidence": "",
+                    },
+                    ...
+                ],
+            },
+            ...
+        ]
+        ```
+        """,
+    ),
+)
+class AIFloodingDetectionView(LoggingMixin, ViewSet):
+    def list(self, request):
+        data_key = "flooding_detection_data"
+        try:
+            redis_url = getenv("REDIS_URL")
+            assert redis_url is not None
+            redis = RedisPal.from_url(redis_url)
+            # Get data and set cache
+            data = redis.get(data_key)
+            assert data is not None
+            assert isinstance(data, list)
+            assert len(data) > 0
+            return Response(data)
+        except Exception:
+            return Response(
+                {"error": "Something went wrong. Try again later."},
+                status=500,
+            )
+
+
+@method_decorator(
+    name="list",
+    decorator=swagger_auto_schema(
+        operation_summary="Retorna o horário de atualização dos pontos de alagamento detectados por IA.",
+        operation_description="""
+        **Resultado**: Retorna um texto contendo o horário de atualização dos pontos de alagamento detectados por IA.
+        """,
+    ),
+)
+class LastUpdateAIFloodingDetectionView(LoggingMixin, ViewSet):
+    def list(self, request):
+        last_update_key = "flooding_detection_last_update"
+        try:
+            redis_url = getenv("REDIS_URL")
+            assert redis_url is not None
+            redis = RedisPal.from_url(redis_url)
+            data = redis.get(last_update_key)
+            return Response(data)
+        except Exception:
+            return Response(
+                {"error": "Something went wrong. Try again later."},
+                status=500,
+            )

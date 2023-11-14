@@ -24,3 +24,13 @@ router.register(
     views.LastUpdate120MinFloodView,
     basename="ultima_atualizacao_alagamento_120min",
 )
+router.register(
+    r"alagamento_detectado_ia",
+    views.AIFloodingDetectionView,
+    basename="alagamento_detectado_ia",
+)
+router.register(
+    r"ultima_atualizacao_alagamento_detectado_ia",
+    views.LastUpdateAIFloodingDetectionView,
+    basename="ultima_atualizacao_alagamento_detectado_ia",
+)
