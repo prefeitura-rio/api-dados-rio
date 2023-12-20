@@ -184,10 +184,10 @@ class LastUpdate120MinFloodView(LoggingMixin, ViewSet):
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
-        operation_summary="Retorna os pontos de alagamento detectados por IA.",
+        operation_summary="Retorna as informações identificadas nas câmeras por IA.",
         operation_description="""
-        **Resultado**: Retorna uma lista contendo todos os pontos de alagamento detectados por IA
-        no seguinte formato:
+        **Resultado**: Retorna uma lista contendo todas as informações detectados por IA pelas
+        câmeras da cidade no seguinte formato:
 
         ```json
         [
@@ -233,9 +233,9 @@ class AIFloodingDetectionView(LoggingMixin, ViewSet):
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
-        operation_summary="Retorna o horário de atualização dos pontos de alagamento detectados por IA.",
+        operation_summary="Retorna o horário de atualização dos pontos detectados por IA.",
         operation_description="""
-        **Resultado**: Retorna um texto contendo o horário de atualização dos pontos de alagamento detectados por IA.
+        **Resultado**: Retorna um texto contendo o horário de atualização dos pontos detectados por IA.
         """,
     ),
 )
