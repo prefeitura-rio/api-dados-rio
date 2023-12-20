@@ -8,6 +8,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework_tracking.mixins import LoggingMixin
 
+from api_dados_rio.v2.clima_alagamento.utils import get_skupper_redis_client
+
 
 # Views for last 15 min
 @method_decorator(
@@ -215,9 +217,7 @@ class AIFloodingDetectionView(LoggingMixin, ViewSet):
     def list(self, request):
         data_key = "flooding_detection_data"
         try:
-            redis_url = getenv("REDIS_URL")
-            assert redis_url is not None
-            redis = RedisPal.from_url(redis_url)
+            redis = get_skupper_redis_client()
             # Get data and set cache
             data = redis.get(data_key)
             assert data is not None
@@ -243,9 +243,7 @@ class LastUpdateAIFloodingDetectionView(LoggingMixin, ViewSet):
     def list(self, request):
         last_update_key = "flooding_detection_last_update"
         try:
-            redis_url = getenv("REDIS_URL")
-            assert redis_url is not None
-            redis = RedisPal.from_url(redis_url)
+            redis = get_skupper_redis_client()
             data = redis.get(last_update_key)
             assert data is not None
             return Response(data)
