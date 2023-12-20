@@ -4,6 +4,7 @@ from .adm_cor_comando.urls import router as adm_cor_comando_router
 from .clima_alagamento.urls import router as clima_alagamento_router
 from .clima_pluviometro.urls import router as clima_pluviometro_router
 from .clima_radar.urls import router as clima_radar_router
+from .vision_ai.urls import router as vision_ai_router
 
 router = IndexRouter(
     routers={
@@ -11,6 +12,7 @@ router = IndexRouter(
         "clima_alagamento": clima_alagamento_router,
         "clima_pluviometro": clima_pluviometro_router,
         "clima_radar": clima_radar_router,
+        "vision_ai": vision_ai_router,
     },
     name="adm_cor_comando",
     swagger_operation_summary="Acessa a versão 2 da API de dados do Escritório de Dados Rio",
