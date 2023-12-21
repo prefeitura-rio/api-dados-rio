@@ -203,6 +203,11 @@ class LastUpdate120MinFloodView(LoggingMixin, ViewSet):
                         "object": "alagamento",
                         "label": false,
                         "confidence": "",
+                        "prompt": "",
+                        "max_output_token": 0,
+                        "temperature": 0.0,
+                        "top_k": 0,
+                        "top_p": 0,
                     },
                     ...
                 ],
