@@ -225,10 +225,6 @@ class AIFloodingDetectionView(LoggingMixin, ViewSet):
             redis = get_skupper_redis_client()
             # Get data and set cache
             data = redis.get(data_key)
-            # move base_64 images from api
-            for d in data:
-                d.pop("image_base64", None)
-
             assert data is not None
             assert isinstance(data, list)
             return Response(data)
