@@ -15,6 +15,26 @@ router.register(
     basename="ultima_atualizacao_precipitacao_15min",
 )
 router.register(
+    r"precipitacao_30min",
+    views.Last30MinRainView,
+    basename="precipitacao_30min",
+)
+router.register(
+    r"ultima_atualizacao_precipitacao_30min",
+    views.LastUpdate30MinRainView,
+    basename="ultima_atualizacao_precipitacao_30min",
+)
+router.register(
+    r"precipitacao_60min",
+    views.Last60MinRainView,
+    basename="precipitacao_60min",
+)
+router.register(
+    r"ultima_atualizacao_precipitacao_60min",
+    views.LastUpdate60MinRainView,
+    basename="ultima_atualizacao_precipitacao_60min",
+)
+router.register(
     r"precipitacao_120min",
     views.Last120MinRainView,
     basename="precipitacao_120min",
@@ -23,4 +43,34 @@ router.register(
     r"ultima_atualizacao_precipitacao_120min",
     views.LastUpdate120MinRainView,
     basename="ultima_atualizacao_precipitacao_120min",
+)
+router.register(
+    r"precipitacao_24h",
+    views.Last24HRainView,
+    basename="precipitacao_24h",
+)
+router.register(
+    r"ultima_atualizacao_precipitacao_24h",
+    views.LastUpdate24HRainView,
+    basename="ultima_atualizacao_precipitacao_24h",
+)
+router.register(
+    r"precipitacao_36h",
+    views.Last36HRainView,
+    basename="precipitacao_36h",
+)
+router.register(
+    r"ultima_atualizacao_precipitacao_36h",
+    views.LastUpdate36HRainView,
+    basename="ultima_atualizacao_precipitacao_36h",
+)
+router.register(
+    r"precipitacao_48h",
+    views.Last48HRainView,
+    basename="precipitacao_48h",
+)
+router.register(
+    r"ultima_atualizacao_precipitacao_48h",
+    views.LastUpdate48HRainView,
+    basename="ultima_atualizacao_precipitacao_48h",
 )
