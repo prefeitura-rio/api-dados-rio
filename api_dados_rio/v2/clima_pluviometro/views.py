@@ -37,8 +37,8 @@ from rest_framework_tracking.mixins import LoggingMixin
     ),
 )
 class Last15MinRainView(LoggingMixin, ViewSet):
-    def __init__(self):
-        self.data_key = "data_last_15min_rain"
+    def __init__(self, data_key="data_last_15min_rain"):
+        self.data_key = data_key
 
     def list(self, request):
         try:
@@ -74,8 +74,8 @@ class Last15MinRainView(LoggingMixin, ViewSet):
     ),
 )
 class LastUpdateRainView(LoggingMixin, ViewSet):
-    def __init__(self):
-        self.last_update_key = "data_last_15min_rain_update"
+    def __init__(self, last_update_key = "data_last_15min_rain_update"):
+        self.last_update_key = last_update_key
 
     def list(self, request):
         try:
@@ -127,8 +127,7 @@ class LastUpdateRainView(LoggingMixin, ViewSet):
 )
 class Last120MinRainView(Last15MinRainView):
     def __init__(self):
-        super().__init__()
-        self.data_key = "data_chuva_passado_alertario"
+        super().__init__(data_key="data_chuva_passado_alertario")
 
 
 @method_decorator(
@@ -148,5 +147,4 @@ class Last120MinRainView(Last15MinRainView):
 )
 class LastUpdate120MinRainView(LastUpdateRainView):
     def __init__(self):
-        super().__init__()
-        self.last_update_key = "data_update_chuva_passado_alertario"
+        super().__init__(last_update_key="data_update_chuva_passado_alertario")
