@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os import getenv
 
 from redis_pal import RedisPal
