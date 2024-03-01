@@ -604,7 +604,6 @@ class LastUpdate12HRainView(LoggingMixin, ViewSet):
             )
 
 
-
 ###### Views for last 24h
 @method_decorator(
     name="list",
