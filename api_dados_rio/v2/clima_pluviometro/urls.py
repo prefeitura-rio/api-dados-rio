@@ -45,6 +45,36 @@ router.register(
     basename="ultima_atualizacao_precipitacao_120min",
 )
 router.register(
+    r"precipitacao_3h",
+    views.Last3HRainView,
+    basename="precipitacao_3h",
+)
+router.register(
+    r"ultima_atualizacao_precipitacao_3h",
+    views.LastUpdate3HRainView,
+    basename="ultima_atualizacao_precipitacao_3h",
+)
+router.register(
+    r"precipitacao_6h",
+    views.Last6HRainView,
+    basename="precipitacao_6h",
+)
+router.register(
+    r"ultima_atualizacao_precipitacao_6h",
+    views.LastUpdate6HRainView,
+    basename="ultima_atualizacao_precipitacao_6h",
+)
+router.register(
+    r"precipitacao_12h",
+    views.Last12HRainView,
+    basename="precipitacao_12h",
+)
+router.register(
+    r"ultima_atualizacao_precipitacao_12h",
+    views.LastUpdate12HRainView,
+    basename="ultima_atualizacao_precipitacao_12h",
+)
+router.register(
     r"precipitacao_24h",
     views.Last24HRainView,
     basename="precipitacao_24h",
@@ -55,22 +85,12 @@ router.register(
     basename="ultima_atualizacao_precipitacao_24h",
 )
 router.register(
-    r"precipitacao_36h",
-    views.Last36HRainView,
-    basename="precipitacao_36h",
+    r"precipitacao_96h",
+    views.Last96HRainView,
+    basename="precipitacao_96h",
 )
 router.register(
-    r"ultima_atualizacao_precipitacao_36h",
-    views.LastUpdate36HRainView,
-    basename="ultima_atualizacao_precipitacao_36h",
-)
-router.register(
-    r"precipitacao_48h",
-    views.Last48HRainView,
-    basename="precipitacao_48h",
-)
-router.register(
-    r"ultima_atualizacao_precipitacao_48h",
-    views.LastUpdate48HRainView,
-    basename="ultima_atualizacao_precipitacao_48h",
+    r"ultima_atualizacao_precipitacao_96h",
+    views.LastUpdate96HRainView,
+    basename="ultima_atualizacao_precipitacao_96h",
 )
