@@ -9,7 +9,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework_tracking.mixins import LoggingMixin
 
 
-# Views for last 15 min
+## Views for last 15 min
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
