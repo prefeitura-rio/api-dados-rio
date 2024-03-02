@@ -108,7 +108,7 @@ class LastUpdateRainView(LoggingMixin, ViewSet):
             {
                 "id_h3": "88a8a03989fffff",
                 "bairro": "Guaratiba",
-                "quantidade": 0.0,
+                "chuva_15min": 0.0,
                 "estacoes": null,
                 "status": "sem chuva",
                 "color": "#ffffff"
@@ -123,7 +123,7 @@ class LastUpdateRainView(LoggingMixin, ViewSet):
 )
 class Last120MinRainView(LoggingMixin, ViewSet):
     def list(self, request):
-        data_key = "data_last_120min_rain"
+        data_key = "data_chuva_passado_alertario"
         try:
             redis_url = getenv("REDIS_URL")
             assert redis_url is not None
@@ -158,7 +158,7 @@ class Last120MinRainView(LoggingMixin, ViewSet):
 )
 class LastUpdate120MinRainView(LoggingMixin, ViewSet):
     def list(self, request):
-        last_update_key = "data_last_120min_rain_update"
+        last_update_key = "data_update_chuva_passado_alertario"
         try:
             redis_url = getenv("REDIS_URL")
             assert redis_url is not None
@@ -193,7 +193,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
             {
                 "id_h3": "88a8a03989fffff",
                 "bairro": "Guaratiba",
-                "quantidade": 0.0,
+                "chuva_15min": 0.0,
                 "estacoes": null,
                 "status": "sem chuva",
                 "color": "#ffffff"
@@ -278,7 +278,7 @@ class LastUpdate30MinRainView(LoggingMixin, ViewSet):
             {
                 "id_h3": "88a8a03989fffff",
                 "bairro": "Guaratiba",
-                "quantidade": 0.0,
+                "chuva_15min": 0.0,
                 "estacoes": null,
                 "status": "sem chuva",
                 "color": "#ffffff"
@@ -363,7 +363,7 @@ class LastUpdate60MinRainView(LoggingMixin, ViewSet):
             {
                 "id_h3": "88a8a03989fffff",
                 "bairro": "Guaratiba",
-                "quantidade": 0.0,
+                "chuva_15min": 0.0,
                 "estacoes": null,
                 "status": "sem chuva",
                 "color": "#ffffff"
@@ -448,7 +448,7 @@ class LastUpdate3HRainView(LoggingMixin, ViewSet):
             {
                 "id_h3": "88a8a03989fffff",
                 "bairro": "Guaratiba",
-                "quantidade": 0.0,
+                "chuva_15min": 0.0,
                 "estacoes": null,
                 "status": "sem chuva",
                 "color": "#ffffff"
@@ -533,7 +533,7 @@ class LastUpdate6HRainView(LoggingMixin, ViewSet):
             {
                 "id_h3": "88a8a03989fffff",
                 "bairro": "Guaratiba",
-                "quantidade": 0.0,
+                "chuva_15min": 0.0,
                 "estacoes": null,
                 "status": "sem chuva",
                 "color": "#ffffff"
@@ -618,7 +618,7 @@ class LastUpdate12HRainView(LoggingMixin, ViewSet):
             {
                 "id_h3": "88a8a03989fffff",
                 "bairro": "Guaratiba",
-                "quantidade": 0.0,
+                "chuva_15min": 0.0,
                 "estacoes": null,
                 "status": "sem chuva",
                 "color": "#ffffff"
@@ -703,7 +703,7 @@ class LastUpdate24HRainView(LoggingMixin, ViewSet):
             {
                 "id_h3": "88a8a03989fffff",
                 "bairro": "Guaratiba",
-                "quantidade": 0.0,
+                "chuva_15min": 0.0,
                 "estacoes": null,
                 "status": "sem chuva",
                 "color": "#ffffff"
