@@ -36,7 +36,7 @@ from rest_framework_tracking.mixins import LoggingMixin
         """,
     ),
 )
-class Last15MinRainView(LoggingMixin, ViewSet):
+class Last15MinRainViewRadar(LoggingMixin, ViewSet):
     def list(self, request):
         data_key = "data_chuva_recente_radar_inea"
         try:
@@ -71,7 +71,7 @@ class Last15MinRainView(LoggingMixin, ViewSet):
         """,
     ),
 )
-class LastUpdateRainView(LoggingMixin, ViewSet):
+class LastUpdateRainViewRadar(LoggingMixin, ViewSet):
     def list(self, request):
         last_update_key = "data_update_chuva_recente_radar_inea"
         try:
@@ -121,7 +121,7 @@ class LastUpdateRainView(LoggingMixin, ViewSet):
         """,
     ),
 )
-class Last120MinRainView(LoggingMixin, ViewSet):
+class Last120MinRainViewRadar(LoggingMixin, ViewSet):
     def list(self, request):
         data_key = "data_chuva_passado_radar_inea"
         try:
@@ -156,7 +156,7 @@ class Last120MinRainView(LoggingMixin, ViewSet):
         """,
     ),
 )
-class LastUpdate120MinRainView(LoggingMixin, ViewSet):
+class LastUpdate120MinRainViewRadar(LoggingMixin, ViewSet):
     def list(self, request):
         last_update_key = "data_update_chuva_passado_radar_inea"
         try:
