@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# flake8: noqa: E501
 from os import getenv
 
 from django.utils.decorators import method_decorator
@@ -36,7 +37,7 @@ from rest_framework_tracking.mixins import LoggingMixin
         """,
     ),
 )
-class Last15MinRainViewRadar(LoggingMixin, ViewSet):
+class Last15MinRainView(LoggingMixin, ViewSet):
     def list(self, request):
         data_key = "data_chuva_recente_radar_inea"
         try:
@@ -71,7 +72,7 @@ class Last15MinRainViewRadar(LoggingMixin, ViewSet):
         """,
     ),
 )
-class LastUpdateRainViewRadar(LoggingMixin, ViewSet):
+class LastUpdateRainView(LoggingMixin, ViewSet):
     def list(self, request):
         last_update_key = "data_update_chuva_recente_radar_inea"
         try:
@@ -92,7 +93,6 @@ class LastUpdateRainViewRadar(LoggingMixin, ViewSet):
                 {"error": "Something went wrong. Try again later."},
                 status=500,
             )
-
 
 # Views for last 120 min
 @method_decorator(
@@ -121,7 +121,7 @@ class LastUpdateRainViewRadar(LoggingMixin, ViewSet):
         """,
     ),
 )
-class Last120MinRainViewRadar(LoggingMixin, ViewSet):
+class Last120MinRainView(LoggingMixin, ViewSet):
     def list(self, request):
         data_key = "data_chuva_passado_radar_inea"
         try:
@@ -156,7 +156,7 @@ class Last120MinRainViewRadar(LoggingMixin, ViewSet):
         """,
     ),
 )
-class LastUpdate120MinRainViewRadar(LoggingMixin, ViewSet):
+class LastUpdate120MinRainView(LoggingMixin, ViewSet):
     def list(self, request):
         last_update_key = "data_update_chuva_passado_radar_inea"
         try:

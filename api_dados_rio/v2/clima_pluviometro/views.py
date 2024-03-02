@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# flake8: noqa: E501
 from os import getenv
 
 from django.utils.decorators import method_decorator
@@ -9,7 +10,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework_tracking.mixins import LoggingMixin
 
 
-## Views for last 15 min
+# Views for last 15 min
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
@@ -92,7 +93,6 @@ class LastUpdateRainView(LoggingMixin, ViewSet):
                 {"error": "Something went wrong. Try again later."},
                 status=500,
             )
-
 
 # Views for last 120 min
 @method_decorator(
@@ -179,7 +179,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
             )
 
 
-# ###### Views for last 30 min
+# Views for last 30 min
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -264,7 +264,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             )
 
 
-# ###### Views for last 60 min
+# Views for last 60 min
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -349,7 +349,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             )
 
 
-# ###### Views for last 3h
+# Views for last 3h
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -434,7 +434,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             )
 
 
-# ###### Views for last 6h
+# Views for last 6h
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -519,7 +519,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             )
 
 
-# ###### Views for last 12h
+# Views for last 12h
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -604,7 +604,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             )
 
 
-# ###### Views for last 24h
+# Views for last 24h
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -689,7 +689,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             )
 
 
-# ###### Views for last 96h
+# Views for last 96h
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
