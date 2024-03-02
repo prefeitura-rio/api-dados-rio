@@ -94,6 +94,7 @@ class LastUpdateRainView(LoggingMixin, ViewSet):
                 status=500,
             )
 
+
 # Views for last 120 min
 @method_decorator(
     name="list",
