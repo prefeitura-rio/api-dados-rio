@@ -24,7 +24,6 @@ from rest_framework_tracking.mixins import LoggingMixin
                 "id_h3": "88a8a03989fffff",
                 "bairro": "Guaratiba",
                 "chuva_15min": 0.0,
-                "quantidade": 0.0,
                 "estacoes": null,
                 "status": "sem chuva",
                 "color": "#ffffff"
