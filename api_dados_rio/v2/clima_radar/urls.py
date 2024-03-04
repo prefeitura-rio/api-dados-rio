@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework import routers
 
-# from api_dados_rio.v2.clima_radar import views
-from . import views
+from api_dados_rio.v2.clima_radar import views
 
 router = routers.DefaultRouter()
 router.register(

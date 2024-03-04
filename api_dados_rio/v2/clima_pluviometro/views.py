@@ -109,7 +109,7 @@ class LastUpdateRainView(LoggingMixin, ViewSet):
             {
                 "id_h3": "88a8a03989fffff",
                 "bairro": "Guaratiba",
-                "chuva_15min": 0.0,
+                "quantidade": 0.0,
                 "estacoes": null,
                 "status": "sem chuva",
                 "color": "#ffffff"
@@ -124,7 +124,7 @@ class LastUpdateRainView(LoggingMixin, ViewSet):
 )
 class Last120MinRainView(LoggingMixin, ViewSet):
     def list(self, request):
-        data_key = "data_chuva_passado_alertario"
+        data_key = "data_last_120min_rain"
         try:
             redis_url = getenv("REDIS_URL")
             assert redis_url is not None
@@ -159,7 +159,7 @@ class Last120MinRainView(LoggingMixin, ViewSet):
 )
 class LastUpdate120MinRainView(LoggingMixin, ViewSet):
     def list(self, request):
-        last_update_key = "data_update_chuva_passado_alertario"
+        last_update_key = "data_last_120min_rain_update"
         try:
             redis_url = getenv("REDIS_URL")
             assert redis_url is not None
@@ -180,7 +180,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
             )
 
 
-# Views for last 30 min
+# # Views for last 30 min
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -194,7 +194,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             {
 #                 "id_h3": "88a8a03989fffff",
 #                 "bairro": "Guaratiba",
-#                 "chuva_15min": 0.0,
+#                 "quantidade": 0.0,
 #                 "estacoes": null,
 #                 "status": "sem chuva",
 #                 "color": "#ffffff"
@@ -265,7 +265,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             )
 
 
-# Views for last 60 min
+# # Views for last 60 min
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -279,7 +279,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             {
 #                 "id_h3": "88a8a03989fffff",
 #                 "bairro": "Guaratiba",
-#                 "chuva_15min": 0.0,
+#                 "quantidade": 0.0,
 #                 "estacoes": null,
 #                 "status": "sem chuva",
 #                 "color": "#ffffff"
@@ -350,7 +350,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             )
 
 
-# Views for last 3h
+# # Views for last 3h
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -364,7 +364,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             {
 #                 "id_h3": "88a8a03989fffff",
 #                 "bairro": "Guaratiba",
-#                 "chuva_15min": 0.0,
+#                 "quantidade": 0.0,
 #                 "estacoes": null,
 #                 "status": "sem chuva",
 #                 "color": "#ffffff"
@@ -435,7 +435,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             )
 
 
-# Views for last 6h
+# # Views for last 6h
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -449,7 +449,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             {
 #                 "id_h3": "88a8a03989fffff",
 #                 "bairro": "Guaratiba",
-#                 "chuva_15min": 0.0,
+#                 "quantidade": 0.0,
 #                 "estacoes": null,
 #                 "status": "sem chuva",
 #                 "color": "#ffffff"
@@ -520,7 +520,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             )
 
 
-# Views for last 12h
+# # Views for last 12h
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -534,7 +534,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             {
 #                 "id_h3": "88a8a03989fffff",
 #                 "bairro": "Guaratiba",
-#                 "chuva_15min": 0.0,
+#                 "quantidade": 0.0,
 #                 "estacoes": null,
 #                 "status": "sem chuva",
 #                 "color": "#ffffff"
@@ -605,7 +605,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             )
 
 
-# Views for last 24h
+# # Views for last 24h
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -619,7 +619,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             {
 #                 "id_h3": "88a8a03989fffff",
 #                 "bairro": "Guaratiba",
-#                 "chuva_15min": 0.0,
+#                 "quantidade": 0.0,
 #                 "estacoes": null,
 #                 "status": "sem chuva",
 #                 "color": "#ffffff"
@@ -690,7 +690,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             )
 
 
-# Views for last 96h
+# # Views for last 96h
 # @method_decorator(
 #     name="list",
 #     decorator=swagger_auto_schema(
@@ -704,7 +704,7 @@ class LastUpdate120MinRainView(LoggingMixin, ViewSet):
 #             {
 #                 "id_h3": "88a8a03989fffff",
 #                 "bairro": "Guaratiba",
-#                 "chuva_15min": 0.0,
+#                 "quantidade": 0.0,
 #                 "estacoes": null,
 #                 "status": "sem chuva",
 #                 "color": "#ffffff"
