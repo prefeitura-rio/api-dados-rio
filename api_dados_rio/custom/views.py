@@ -53,9 +53,9 @@ class IndexView(APIView):
                     pattern = str(urlpatterns.pattern).rstrip("/")
                     if self.ignore_admin and pattern == "admin":
                         continue
-                    data[
-                        str(urlpatterns.pattern).rstrip("/")
-                    ] = f"{current_url}/{str(urlpatterns.pattern)}"
+                    data[str(urlpatterns.pattern).rstrip("/")] = (
+                        f"{current_url}/{str(urlpatterns.pattern)}"
+                    )
                 elif isinstance(urlpatterns, URLPattern):
                     # Parse the URLPattern to something readable
                     base_pattern = str(urlpatterns.pattern).rstrip("$")

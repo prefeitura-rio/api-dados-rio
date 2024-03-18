@@ -155,9 +155,9 @@ class EventosAbertosView(LoggingMixin, ViewSet):
             if "error" in result and result["error"]:
                 if key_backup in cache:
                     result = cache.get(key_backup)
-                    result[
-                        "error"
-                    ] = "Failed to fetch new data, using backup cached data."
+                    result["error"] = (
+                        "Failed to fetch new data, using backup cached data."
+                    )
                     return Response(result, status=200)
                 return Response(
                     {
@@ -177,9 +177,9 @@ class EventosAbertosView(LoggingMixin, ViewSet):
             if key_backup in cache:
                 result = cache.get(key_backup)
                 last_update = cache.get(key_backup_last_updated)
-                result[
-                    "error"
-                ] = f"Failed to fetch new data, using backup cached data from {last_update}."
+                result["error"] = (
+                    f"Failed to fetch new data, using backup cached data from {last_update}."
+                )
                 return Response(result, status=200)
             return Response(
                 {"error": "Something went wrong. Try again later."},
